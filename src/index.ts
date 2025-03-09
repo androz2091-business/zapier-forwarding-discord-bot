@@ -33,7 +33,8 @@ const onMessage = (client: Client) => Effect.sync(() => {
     client.on(Events.MessageCreate, (message) => {
         Effect.runSync(log(`New message: ${message.content}`));
         if (Effect.runSync(getConfig).channelIds.includes(message.channelId)) {
-            Effect.runPromise(sendZapierWebhook(`New message: ${message.content}`));
+            Effect.runSync(log(`Sending message to Zapier webhook`));
+            Effect.runPromise(sendZapierWebhook(message.content));
         }
     });
 });

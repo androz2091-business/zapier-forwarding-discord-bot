@@ -1,31 +1,6 @@
-# Effect Package Template
+# Discord Threads to Zapier
 
-This template provides a solid foundation for building scalable and maintainable TypeScript package with Effect. 
+Enter the Zapier webhook url, the thread IDs, your Discord bot token.
 
-## Running Code
+Use the "content" variable on the Zapier webhook interface.
 
-This template leverages [tsx](https://tsx.is) to allow execution of TypeScript files via NodeJS as if they were written in plain JavaScript.
-
-To execute a file with `tsx`:
-
-```sh
-pnpm tsx ./path/to/the/file.ts
-```
-
-## Operations
-
-**Building**
-
-To build the package:
-
-```sh
-pnpm build
-```
-
-**Testing**
-
-To test the package:
-
-```sh
-pnpm test
-```

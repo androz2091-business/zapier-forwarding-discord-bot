@@ -1,17 +1,17 @@
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
 import { Effect, pipe } from 'effect';
-import { UnknownException } from 'effect/Cause';
 
 dotenv.config();
 
 const getConfig = Effect.sync(() => {
     const token = process.env.DISCORD_TOKEN;
     const webhookUrl = process.env.ZAPIER_WEBHOOK_URL;
+    const channelIds = process.env.CHANNEL_IDS?.split(',') || [];
     if (!token || !webhookUrl) {
         throw new Error('No token or webhook URL provided');
     }
-    return { token, webhookUrl };
+    return { token, webhookUrl, channelIds };
 });
 
 const sendZapierWebhook = (content: string) => Effect.tryPromise(() => 
@@ -31,8 +31,8 @@ const login = (client: Client) => Effect.tryPromise(() => client.login(Effect.ru
 
 const onMessage = (client: Client) => Effect.sync(() => {
     client.on(Events.MessageCreate, (message) => {
-        log(`New message: ${message.content}`);
-        if (message.channelId == '5') {
+        Effect.runSync(log(`New message: ${message.content}`));
+        if (Effect.runSync(getConfig).channelIds.includes(message.channelId)) {
             Effect.runPromise(sendZapierWebhook(`New message: ${message.content}`));
         }
     });

@@ -24,6 +24,8 @@
     "coverage": "vitest --coverage"
   },
   "dependencies": {
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.4.7",
     "effect": "latest"
   },
   "devDependencies": {

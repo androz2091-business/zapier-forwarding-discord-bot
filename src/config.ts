@@ -19,7 +19,5 @@ export class ConfigService extends Effect.Tag('ConfigService')<
   ConfigService,
   Effect.Effect.Success<typeof make>
 >() {
-  static layer = Layer.effect(ConfigService, make);
-
-  static Live = this.layer;
+  static Live = Layer.effect(this, make);
 }

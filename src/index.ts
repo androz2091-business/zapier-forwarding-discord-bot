@@ -21,7 +21,7 @@ const sendDiscordWebhook = (message: Message|PartialMessage) => Effect.gen(funct
     const config = yield* ConfigService
     const webhookClient = new WebhookClient({ url: config.journalServerDiscordWebhookUrl });
     webhookClient.send({
-        content: `Forwarded from ${messageData.url}\n\n${messageData.content}`,
+        content: messageData.content,
         username: messageData.author.username,
         avatarURL: messageData.author.displayAvatarURL(),
         files: messageData.attachments.map((attachment) => attachment.url)
@@ -50,7 +50,7 @@ client.on(Events.MessageReactionAdd, (reaction, user) => managedRuntime.runPromi
     Effect.gen(function* () {
         const {adminIds} = yield* ConfigService
         yield* Effect.log("new reaction")
-        if (adminIds.includes(user.id) && reaction.emoji.name === '🔥') {
+        if (adminIds.includes(user.id) && reaction.emoji.name === '⏩') {
             yield* Effect.log(`Sending message to Zapier webhook`);
             yield* sendDiscordWebhook(reaction.message);
         }

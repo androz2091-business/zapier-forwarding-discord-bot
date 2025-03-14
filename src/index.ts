@@ -1,9 +1,11 @@
-import { Client, Events, GatewayIntentBits, Message } from 'discord.js';
+import { Client, Events, GatewayIntentBits, Partials, WebhookClient } from 'discord.js';
+import type { Message, PartialMessage } from 'discord.js';
 import { Effect, Layer, ManagedRuntime, pipe } from 'effect';
 import { ConfigService } from './config.ts';
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions],
+    partials: [Partials.Message, Partials.Reaction],
 });
 
 const sendZapierWebhook = (content: string) => Effect.gen(function*() { 
@@ -12,6 +14,18 @@ const sendZapierWebhook = (content: string) => Effect.gen(function*() {
         method: 'POST',
         body: JSON.stringify({ content }),
     })
+});
+
+const sendDiscordWebhook = (message: Message|PartialMessage) => Effect.gen(function*() {
+    const messageData = yield* Effect.promise(() => message.fetch());
+    const config = yield* ConfigService
+    const webhookClient = new WebhookClient({ url: config.journalServerDiscordWebhookUrl });
+    webhookClient.send({
+        content: `Forwarded from ${messageData.url}\n\n${messageData.content}`,
+        username: messageData.author.username,
+        avatarURL: messageData.author.displayAvatarURL(),
+        files: messageData.attachments.map((attachment) => attachment.url)
+    });
 });
 
 const login = Effect.gen(function*() {
@@ -28,6 +42,17 @@ client.on(Events.MessageCreate, (message) => managedRuntime.runPromise(
         if (channelIds.includes(message.channelId)) {
             yield* Effect.log(`Sending message to Zapier webhook`);
             yield* sendZapierWebhook(message.content);
+        }
+    })
+));
+
+client.on(Events.MessageReactionAdd, (reaction, user) => managedRuntime.runPromise(
+    Effect.gen(function* () {
+        const {adminIds} = yield* ConfigService
+        yield* Effect.log("new reaction")
+        if (adminIds.includes(user.id) && reaction.emoji.name === '🔥') {
+            yield* Effect.log(`Sending message to Zapier webhook`);
+            yield* sendDiscordWebhook(reaction.message);
         }
     })
 ));

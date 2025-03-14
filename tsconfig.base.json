@@ -21,6 +21,7 @@
     "noImplicitReturns": false,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
+    "emitDeclarationOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": false,
     "noErrorTruncation": false,

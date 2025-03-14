@@ -7,11 +7,22 @@ const make = Effect.gen(function* () {
     Config.withDefault(''),
     Config.map((ids) => ids.split(','))
   );
+  // these are the ids of the users who can react with :fire: to messages
+  // and it will trigger a forward to the journal server
+  const adminIds = yield* Config.string('ADMIN_IDS').pipe(
+    Config.withDefault(''),
+    Config.map((ids) => ids.split(','))
+  );
+  const journalServerDiscordWebhookUrl = yield* Config.string(
+    'JOURNAL_SERVER_DISCORD_WEBHOOK_URL'
+  );
 
   return {
     discordToken,
     zapierWebhookUrl,
-    channelIds
+    channelIds,
+    adminIds,
+    journalServerDiscordWebhookUrl
   } as const;
 });
 
